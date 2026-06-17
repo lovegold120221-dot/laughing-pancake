@@ -36,6 +36,12 @@
           <strong>Provider:</strong> Eburon AI
           <span class="pill">talkhuman-3.1</span>
         </div>
+        <nav class="quick-links" aria-label="API links">
+          <a href="/api">API</a>
+          <a href="/docs">Swagger</a>
+          <a href="/redoc">Docs</a>
+          <a href="/openapi.json">OpenAPI</a>
+        </nav>
         <div id="connectionStatus" class="status idle">Idle</div>
       </header>
 
@@ -47,19 +53,19 @@
           <div class="card">
             <h3>TalkHuman Live</h3>
             <p>Realtime expressive human voice endpoint.</p>
-            <code>/v1/eburon/talkhuman/ws</code>
+            <a href="/v1/eburon/talkhuman/voices">Voice API</a>
           </div>
 
           <div class="card">
             <h3>TalkHuman RolePlay</h3>
             <p>Cinematic role-play and live monologue endpoint.</p>
-            <code>/v1/eburon/talkhuman/roleplay/ws</code>
+            <a href="/docs#/Eburon%20AI%20TalkHuman%20RolePlay">Swagger group</a>
           </div>
 
           <div class="card">
             <h3>Eburon Translate</h3>
             <p>Text, image, document, and website translation.</p>
-            <code>/v1/eburon/translate/*</code>
+            <a href="/v1/eburon/translate/languages">Language API</a>
           </div>
         </div>
       </section>
@@ -182,7 +188,7 @@
 
         <label>
           Base Endpoint
-          <input id="baseEndpoint" value="http://localhost:8000" />
+          <input id="baseEndpoint" placeholder="Same origin" />
         </label>
 
         <label>

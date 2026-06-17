@@ -4,7 +4,6 @@ from fastapi.responses import Response
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import FileResponse
-import os
 
 from app.core.errors import (
     EburonTranslateError,
@@ -66,17 +65,26 @@ app.include_router(models.router)
 # Mount static files for playground
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
+@app.get("/", include_in_schema=False)
 @app.get("/playground", include_in_schema=False)
 async def playground():
     return FileResponse("app/static/playground/index.html")
 
-@app.get("/", tags=["Health"])
 
-async def root() -> dict:
+@app.head("/", include_in_schema=False)
+@app.head("/playground", include_in_schema=False)
+async def playground_head() -> Response:
+    return Response(status_code=200, media_type="text/html")
+
+
+@app.get("/api", tags=["Health"])
+async def api_index() -> dict:
     return {
         "provider": "Eburon AI",
         "status": "ok",
+        "playground": "/",
         "docs": "/docs",
+        "redoc": "/redoc",
         "openapi": "/openapi.json",
         "products": [
             {

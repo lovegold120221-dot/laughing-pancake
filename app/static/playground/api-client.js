@@ -7,7 +7,7 @@
   };
 
   function getBaseEndpoint() {
-    return document.getElementById("baseEndpoint")?.value || "http://localhost:8000";
+    return document.getElementById("baseEndpoint")?.value?.trim() || window.location.origin;
   }
 
   function getAuthHeaders() {

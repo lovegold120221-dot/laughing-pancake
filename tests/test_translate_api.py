@@ -98,14 +98,24 @@ class TranslateApiTests(unittest.TestCase):
         self.assertIn("zh-CN", target_codes)
         self.assertIn("zh-TW", target_codes)
 
-    def test_root_is_api_discovery_not_translate_error(self) -> None:
+    def test_root_is_playground_entry_page(self) -> None:
         response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn("text/html", response.headers["content-type"])
+        self.assertIn("Eburon AI Playground", response.text)
+        self.assertIn('href="/docs"', response.text)
+        self.assertIn('href="/api"', response.text)
+        self.assertIn('href="/openapi.json"', response.text)
+
+    def test_api_discovery_is_linked_separately(self) -> None:
+        response = self.client.get("/api")
         self.assertEqual(response.status_code, 200)
         payload = response.json()
 
         self.assertEqual(payload["provider"], "Eburon AI")
+        self.assertEqual(payload["playground"], "/")
         self.assertEqual(payload["docs"], "/docs")
-        self.assertNotIn("error", payload)
 
     def test_favicon_does_not_return_translate_error(self) -> None:
         response = self.client.get("/favicon.ico")
