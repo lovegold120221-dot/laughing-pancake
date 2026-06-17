@@ -101,16 +101,6 @@ def list_languages() -> dict:
     languages = dropdowns["languages"]
     source_languages = dropdowns["source_languages"]
     target_languages = dropdowns["target_languages"]
-    if official_translate_adapter.is_configured():
-        try:
-            languages = official_translate_adapter.list_languages()
-            source_languages = [
-                {"code": "auto", "name": "Detect language"},
-                *languages,
-            ]
-            target_languages = languages
-        except EburonTranslateError:
-            pass
 
     return {
         "provider": "Eburon AI",

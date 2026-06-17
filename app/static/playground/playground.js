@@ -136,7 +136,7 @@
     const data = await EburonPlayground.apiGet("/v1/eburon/talkhuman/voices");
     const options = data.voices.map((voice) => ({
       value: voice.alias,
-      label: `${voice.display_name} · ${voice.style}`,
+      label: `${voice.alias} · ${voice.style}`,
     }));
 
     replaceSelectOptions(document.getElementById("talkhumanVoice"), options, "Phoenix");

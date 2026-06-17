@@ -98,6 +98,36 @@ class TranslateApiTests(unittest.TestCase):
         self.assertIn("zh-CN", target_codes)
         self.assertIn("zh-TW", target_codes)
 
+    def test_translate_languages_do_not_shrink_when_backend_is_configured(self) -> None:
+        with (
+            patch(
+                "app.services.official_translate_adapter.is_configured",
+                return_value=True,
+            ),
+            patch(
+                "app.services.official_translate_adapter.list_languages",
+                return_value=[{"code": "en", "name": "English"}],
+            ),
+        ):
+            response = self.client.get("/v1/eburon/translate/languages")
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        target_codes = {language["code"] for language in payload["target_languages"]}
+
+        self.assertGreaterEqual(payload["target_count"], 240)
+        self.assertIn("zh-CN", target_codes)
+        self.assertIn("zh-TW", target_codes)
+        self.assertIn("yua", target_codes)
+
+    def test_playground_voice_dropdown_uses_alias_labels(self) -> None:
+        with open("app/static/playground/playground.js", encoding="utf-8") as file:
+            script = file.read()
+
+        self.assertIn("value: voice.alias", script)
+        self.assertIn("label: `${voice.alias}", script)
+        self.assertNotIn("label: `${voice.display_name}", script)
+
     def test_root_is_playground_entry_page(self) -> None:
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
