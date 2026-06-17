@@ -1,0 +1,13 @@
+[project]
+name = "eburon-core"
+version = "0.1.0"
+description = "Eburon AI public API gateway."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.135.0",
+    "uvicorn>=0.42.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

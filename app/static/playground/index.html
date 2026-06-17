@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Eburon AI Playground</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="/static/playground/playground.css" rel="stylesheet" />
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">E</div>
+        <div>
+          <h1>Eburon AI</h1>
+          <p>Unified Playground</p>
+        </div>
+      </div>
+
+      <nav class="tabs">
+        <button data-tab="overview" class="active">Overview</button>
+        <button data-tab="talkhuman">TalkHuman Live</button>
+        <button data-tab="roleplay">RolePlay</button>
+        <button data-tab="translate-text">Translate Text</button>
+        <button data-tab="translate-image">Translate Images</button>
+        <button data-tab="translate-doc">Translate Documents</button>
+        <button data-tab="translate-web">Translate Websites</button>
+        <button data-tab="logs">API Logs</button>
+        <button data-tab="settings">Settings</button>
+      </nav>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div>
+          <strong>Provider:</strong> Eburon AI
+          <span class="pill">talkhuman-3.1</span>
+        </div>
+        <div id="connectionStatus" class="status idle">Idle</div>
+      </header>
+
+      <section id="tab-overview" class="panel active">
+        <h2>Overview</h2>
+        <p>Test TalkHuman, RolePlay, and Translate endpoints from one static HTML playground.</p>
+
+        <div class="endpoint-grid">
+          <div class="card">
+            <h3>TalkHuman Live</h3>
+            <p>Realtime expressive human voice endpoint.</p>
+            <code>/v1/eburon/talkhuman/ws</code>
+          </div>
+
+          <div class="card">
+            <h3>TalkHuman RolePlay</h3>
+            <p>Cinematic role-play and live monologue endpoint.</p>
+            <code>/v1/eburon/talkhuman/roleplay/ws</code>
+          </div>
+
+          <div class="card">
+            <h3>Eburon Translate</h3>
+            <p>Text, image, document, and website translation.</p>
+            <code>/v1/eburon/translate/*</code>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-talkhuman" class="panel">
+        <h2>TalkHuman Live</h2>
+        <div class="form-row">
+          <label>
+            Voice
+            <select id="talkhumanVoice"></select>
+          </label>
+        </div>
+
+        <textarea id="talkhumanMessage" placeholder="Say something to TalkHuman..."></textarea>
+
+        <div class="actions">
+          <button id="createTalkhumanSession">Create Session</button>
+          <button id="sendTalkhumanMessage">Send Message</button>
+          <button id="connectTalkhumanWs">Connect WebSocket</button>
+          <button id="closeTalkhumanWs">Close</button>
+        </div>
+      </section>
+
+      <section id="tab-roleplay" class="panel">
+        <h2>TalkHuman RolePlay</h2>
+
+        <label>Role-play request</label>
+        <textarea id="roleplayPrompt" placeholder="Example: Act as a stranded astronaut sending a final message to Earth."></textarea>
+
+        <div class="form-row">
+          <label>
+            Tone
+            <select id="roleplayTone">
+              <option value="auto">Auto</option>
+              <option value="dramatic">Dramatic</option>
+              <option value="comedy">Comedy</option>
+              <option value="horror">Horror</option>
+              <option value="business">Business</option>
+              <option value="educational">Educational</option>
+              <option value="villain">Villain</option>
+              <option value="hero">Hero</option>
+              <option value="cinematic">Cinematic</option>
+              <option value="emotional">Emotional</option>
+              <option value="calm">Calm</option>
+            </select>
+          </label>
+
+          <label>
+            Voice
+            <select id="roleplayVoice"></select>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="createRoleplaySession">Create RolePlay Session</button>
+          <button id="performRoleplay">Perform</button>
+          <button id="continueRoleplay">Continue</button>
+          <button id="interruptRoleplay">Interrupt</button>
+          <button id="connectRoleplayWs">Connect RolePlay WS</button>
+          <button id="closeRoleplayWs">Close</button>
+        </div>
+
+        <div class="output-card">
+          <h3>RolePlay Text Events</h3>
+          <pre id="roleplayTextOutput"></pre>
+        </div>
+      </section>
+
+      <section id="tab-translate-text" class="panel">
+        <h2>Translate Text</h2>
+
+        <div class="form-row">
+          <label>
+            Source
+            <select id="translateSource"></select>
+          </label>
+          <label>
+            Target
+            <select id="translateTarget"></select>
+          </label>
+        </div>
+
+        <textarea id="translateTextInput" placeholder="Enter text to translate..."></textarea>
+
+        <div class="actions">
+          <button id="runTextTranslate">Translate</button>
+        </div>
+
+        <pre id="translateTextOutput"></pre>
+      </section>
+
+      <section id="tab-translate-image" class="panel">
+        <h2>Translate Images</h2>
+        <input id="imageTranslateFile" type="file" accept="image/*" />
+        <button id="runImageTranslate">Translate Image</button>
+        <pre id="imageTranslateOutput"></pre>
+      </section>
+
+      <section id="tab-translate-doc" class="panel">
+        <h2>Translate Documents</h2>
+        <input id="documentTranslateFile" type="file" />
+        <button id="runDocumentTranslate">Translate Document</button>
+        <pre id="documentTranslateOutput"></pre>
+      </section>
+
+      <section id="tab-translate-web" class="panel">
+        <h2>Translate Website</h2>
+        <input id="websiteTranslateUrl" placeholder="https://example.com" />
+        <button id="runWebsiteTranslate">Translate Website</button>
+        <pre id="websiteTranslateOutput"></pre>
+      </section>
+
+      <section id="tab-logs" class="panel">
+        <h2>API Logs</h2>
+        <pre id="apiLogs"></pre>
+      </section>
+
+      <section id="tab-settings" class="panel">
+        <h2>Settings</h2>
+
+        <label>
+          Base Endpoint
+          <input id="baseEndpoint" value="http://localhost:8000" />
+        </label>
+
+        <label>
+          Auth Token
+          <input id="authToken" placeholder="Bearer token" />
+        </label>
+      </section>
+    </section>
+  </section>
+
+  <script src="/static/playground/api-client.js"></script>
+  <script src="/static/playground/talkhuman-client.js"></script>
+  <script src="/static/playground/roleplay-client.js"></script>
+  <script src="/static/playground/translate-client.js"></script>
+  <script src="/static/playground/playground.js"></script>
+</body>
+</html>

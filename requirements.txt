@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+google-genai
+google-cloud-translate
+google-cloud-vision
+python-multipart
+websockets
