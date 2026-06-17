@@ -3,15 +3,18 @@
     const buttons = document.querySelectorAll("[data-tab]");
     const panels = document.querySelectorAll(".panel");
 
+    function activateTab(tab, activeButton) {
+      buttons.forEach((b) => b.classList.remove("active"));
+      panels.forEach((p) => p.classList.remove("active"));
+
+      const navButton = document.querySelector(`.tab-nav button[data-tab="${tab}"]`);
+      (navButton || activeButton)?.classList.add("active");
+      document.getElementById(`tab-${tab}`)?.classList.add("active");
+    }
+
     buttons.forEach((button) => {
       button.addEventListener("click", () => {
-        const tab = button.dataset.tab;
-
-        buttons.forEach((b) => b.classList.remove("active"));
-        panels.forEach((p) => p.classList.remove("active"));
-
-        button.classList.add("active");
-        document.getElementById(`tab-${tab}`)?.classList.add("active");
+        activateTab(button.dataset.tab, button);
       });
     });
   }
@@ -121,6 +124,14 @@
   function replaceSelectOptions(select, options, selectedValue) {
     if (!select) return;
 
+    if (!options.length) {
+      const option = document.createElement("option");
+      option.textContent = "No mappings available";
+      option.disabled = true;
+      select.replaceChildren(option);
+      return;
+    }
+
     select.replaceChildren(
       ...options.map((option) => {
         const item = document.createElement("option");
@@ -132,36 +143,85 @@
     );
   }
 
+  function setText(id, value) {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  }
+
+  function formatCount(value, label) {
+    const count = Number(value || 0).toLocaleString();
+    return `${count} ${label}`;
+  }
+
+  function populateVoiceCatalog(voices) {
+    const catalog = document.getElementById("voiceCatalog");
+    if (!catalog) return;
+
+    catalog.replaceChildren(
+      ...voices.map((voice) => {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = voice.alias;
+        chip.title = voice.description || voice.style || voice.alias;
+        return chip;
+      })
+    );
+  }
+
   async function loadVoices() {
     const data = await EburonPlayground.apiGet("/v1/eburon/talkhuman/voices");
-    const options = data.voices.map((voice) => ({
+    const voices = Array.isArray(data.voices) ? data.voices : [];
+    const options = voices.map((voice) => ({
       value: voice.alias,
-      label: `${voice.alias} · ${voice.style}`,
+      label: `${voice.alias} - ${voice.style}${voice.description ? ` - ${voice.description}` : ""}`,
     }));
+    const voiceCount = data.count || voices.length;
 
     replaceSelectOptions(document.getElementById("talkhumanVoice"), options, "Phoenix");
     replaceSelectOptions(document.getElementById("roleplayVoice"), options, "Batman");
+    populateVoiceCatalog(voices);
+    setText("voiceCount", formatCount(voiceCount, "aliases"));
+    setText("voiceMetric", formatCount(voiceCount, "voices"));
+    setText("voiceMappingCount", voiceCount.toLocaleString());
   }
 
   async function loadLanguages() {
     const data = await EburonPlayground.apiGet("/v1/eburon/translate/languages");
-    const sourceOptions = data.source_languages.map((language) => ({
+    const sourceLanguages = Array.isArray(data.source_languages) ? data.source_languages : [];
+    const targetLanguages = Array.isArray(data.target_languages) ? data.target_languages : [];
+    const sourceOptions = sourceLanguages.map((language) => ({
       value: language.code,
       label: `${language.name} (${language.code})`,
     }));
-    const targetOptions = data.target_languages.map((language) => ({
+    const targetOptions = targetLanguages.map((language) => ({
       value: language.code,
       label: `${language.name} (${language.code})`,
     }));
+    const sourceCount = data.source_count || sourceLanguages.length;
+    const targetCount = data.target_count || targetLanguages.length;
 
     replaceSelectOptions(document.getElementById("translateSource"), sourceOptions, "auto");
     replaceSelectOptions(document.getElementById("translateTarget"), targetOptions, "es");
+    setText("languageCount", `${sourceCount.toLocaleString()} source / ${targetCount.toLocaleString()} target`);
+    setText("languageMetric", formatCount(targetCount, "targets"));
+    setText("sourceLanguageCount", sourceCount.toLocaleString());
+    setText("targetLanguageCount", targetCount.toLocaleString());
   }
 
   async function loadDropdownMetadata() {
     try {
+      EburonPlayground.setStatus("Loading mappings", "idle");
       await Promise.all([loadVoices(), loadLanguages()]);
+      EburonPlayground.setStatus("Mappings ready", "connected");
     } catch (err) {
+      EburonPlayground.setStatus("Mapping load failed", "error");
+      setText("voiceCount", "Unavailable");
+      setText("voiceMetric", "Unavailable");
+      setText("voiceMappingCount", "Unavailable");
+      setText("languageCount", "Unavailable");
+      setText("languageMetric", "Unavailable");
+      setText("sourceLanguageCount", "Unavailable");
+      setText("targetLanguageCount", "Unavailable");
       EburonPlayground.logApi({
         type: "metadata_load_error",
         message: err.message,

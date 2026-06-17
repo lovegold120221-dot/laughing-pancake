@@ -137,6 +137,17 @@ class TranslateApiTests(unittest.TestCase):
         self.assertIn('href="/docs"', response.text)
         self.assertIn('href="/api"', response.text)
         self.assertIn('href="/openapi.json"', response.text)
+        self.assertIn('href="/playground"', response.text)
+        self.assertIn("Swagger UI", response.text)
+
+    def test_playground_route_is_canonical_entry_page(self) -> None:
+        response = self.client.get("/playground")
+        self.assertEqual(response.status_code, 200)
+
+        self.assertIn("text/html", response.headers["content-type"])
+        self.assertIn("Eburon AI Playground", response.text)
+        self.assertIn('id="talkhumanVoice"', response.text)
+        self.assertIn('id="translateTarget"', response.text)
 
     def test_api_discovery_is_linked_separately(self) -> None:
         response = self.client.get("/api")
@@ -144,7 +155,7 @@ class TranslateApiTests(unittest.TestCase):
         payload = response.json()
 
         self.assertEqual(payload["provider"], "Eburon AI")
-        self.assertEqual(payload["playground"], "/")
+        self.assertEqual(payload["playground"], "/playground")
         self.assertEqual(payload["docs"], "/docs")
 
     def test_favicon_does_not_return_translate_error(self) -> None:

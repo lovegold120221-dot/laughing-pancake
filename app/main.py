@@ -82,7 +82,7 @@ async def api_index() -> dict:
     return {
         "provider": "Eburon AI",
         "status": "ok",
-        "playground": "/",
+        "playground": "/playground",
         "docs": "/docs",
         "redoc": "/redoc",
         "openapi": "/openapi.json",
